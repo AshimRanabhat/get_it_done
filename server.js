@@ -1,6 +1,10 @@
 const express = require('express');
 const path = require('path')
 const services = require('./services');
+const user = require('./db/userData');
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config();
+}
 
 const app = express();
 const calendar = services.getCalendar();
@@ -16,7 +20,7 @@ app.get('/calendar', (req, res)=>{
 })
 
 app.get('/successfulDays', (req, res)=>{
-    res.send(JSON.stringify(services.successfulDays));
+    res.send(JSON.stringify(user.getsuccessfulDays()));
 })
 
 app.listen(process.env.PORT || 8080);
