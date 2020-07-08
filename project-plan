@@ -1,7 +1,0 @@
-1. The app needs a calander.
-2. The app needs to track progress.
-3. The app needs to have users.
-
-what to use- express, passport js, postgres, moment
-
-database- user(email, password, calander)

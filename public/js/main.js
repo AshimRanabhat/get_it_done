@@ -1,4 +1,9 @@
 
+const MONTHS =[
+    'January', 'Febuary', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
+
 function createCalanderSkeleton(months){
     let container = document.createElement('div');
     container.classList.add("container");
@@ -27,10 +32,19 @@ function createCalanderSkeleton(months){
     })
 }
 
-function insertDateToArray(positionInRow, date, successfulDay) {
+function insertDateToArray(positionInRow, day, successfulDay) {
+    let date = new Date(day).getDate();
+    let month = new Date(day).getMonth();
+    let currentDate = new Date().getDate();
+    let currentMonth = new Date().getMonth();
     let dataToInsert = "";
+
     if (positionInRow === 0){ dataToInsert += "<tr>"};
-    if(date && successfulDay){
+
+    if(month == currentMonth && date == currentDate){
+        console.log("execute this mofo")
+        dataToInsert += `<td><button type="button" class="btn btn-outline-success" style="display:block;width:100%" id="submitButton" value="${day}">${date}</button></td>`;
+    }else if(date && successfulDay){
         dataToInsert += `<td class="table-success">${date}</td>`;
     }else if(date){
         dataToInsert += `<td>${date}</td>`;
@@ -42,10 +56,7 @@ function insertDateToArray(positionInRow, date, successfulDay) {
 }
 
 function generateCalendar(monthsDataArray){
-    const MONTHS =[
-        'January', 'Febuary', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
+
     MONTHS.forEach((month, index)=>{
         let currentTable = document.getElementById(month);
         currentTable.innerHTML += monthsDataArray[index];
@@ -53,10 +64,7 @@ function generateCalendar(monthsDataArray){
 }
 
 async function main(){
-    const MONTHS =[
-        'January', 'Febuary', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
+
     let calendarData = await fetch("http://localhost:8080/calendar").then((result)=>{ return result.json() });
     let successfulDays = await fetch("http://localhost:8080/successfulDays").then((result)=>{ return result.json() });
     createCalanderSkeleton(MONTHS);
@@ -67,7 +75,6 @@ async function main(){
     let month = 0;
 
     calendarData.forEach((day)=>{
-        let date = new Date(day).getDate();
         let currentMonth = new Date(day).getMonth();
         let dayOfWeek = new Date(day).getDay();
         let successfulDay = false;
@@ -88,13 +95,30 @@ async function main(){
             positionInRow++;
         }
 
-        monthsDataArray[month] += insertDateToArray(positionInRow, date, successfulDay);
+        monthsDataArray[month] += insertDateToArray(positionInRow, day, successfulDay);
 
         previousMonth = currentMonth;
         if (positionInRow == 6){ positionInRow = 0; }
         else{ positionInRow++; }
     })
     generateCalendar(monthsDataArray);
+
+    let submitButton = document.getElementById('submitButton');
+
+    submitButton.addEventListener('click', ()=>{
+        let data = submitButton.value;
+        submitButton.disabled = true;
+        fetch('http://localhost:8080/successfulDays',{
+                                                    method: "POST",
+                                                    headers:{ 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({data})
+                                                })
+            .then((res)=>{
+                if(res.status !== 200){
+                    submitButton.disabled = false;
+                }
+            })
+    })
 };
 
 main();

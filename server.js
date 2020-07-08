@@ -10,6 +10,7 @@ if(process.env.NODE_ENV !== 'production'){
 const app = express();
 const calendar = getCalendar();
 
+app.use(express.json());
 app.use(express.static(path.join(__dirname,'/public')));
 
 app.get('/', (req, res)=>{
@@ -22,6 +23,16 @@ app.get('/calendar', (req, res)=>{
 
 app.get('/successfulDays', (req, res)=>{
     res.send(JSON.stringify(user.getsuccessfulDays()));
+})
+
+app.post('/successfulDays',async (req, res)=>{
+    let today = moment();
+    if (today.isSame(req.body.data)){ 
+        let appendAttempt = await user.appendSuccessfulDay();
+        if (appendAttempt == true){ res.sendStatus(200); }
+        else { res.sendStatus(500) }
+    }
+    res.sendStatus(400);
 })
 
 function getCalendar(year) {
