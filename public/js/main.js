@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 const MONTHS =[
     'January', 'Febuary', 'March', 'April', 'May', 'June',
