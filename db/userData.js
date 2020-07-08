@@ -26,7 +26,7 @@ async function createUser(email, password, name){
 async function getUserInformation(email){
     try{
         let result = await pool.query('SELECT email, password, name FROM user_data WHERE email=$1', [email]);
-        return result.rows;
+        return result.rows[0];
     }catch(err){
         console.log("Failed to get user information", err);
         return false;
@@ -47,7 +47,8 @@ async function deleteUser(email){
 async function getSuccessfulDays(email){
     try{
         let result = await pool.query('SELECT successful_days FROM user_data WHERE email=$1', [email]);
-        return result.rows[0];
+        if (result.rows[0].successful_days == null){ return []}
+        return result.rows[0].successful_days;
     }catch(err){
         console.log("Failed to get successfulDays ", err);
         return false;

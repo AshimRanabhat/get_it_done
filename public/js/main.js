@@ -43,7 +43,7 @@ function insertDateToArray(positionInRow, day, successfulDay) {
     if (positionInRow === 0){ dataToInsert += "<tr>"};
 
     if(month == currentMonth && date == currentDate){
-        console.log("execute this mofo")
+        console.log(date, currentDate, day)
         dataToInsert += `<td><button type="button" class="btn btn-outline-success" style="display:block;width:100%" id="submitButton" value="${day}">${date}</button></td>`;
     }else if(date && successfulDay){
         dataToInsert += `<td class="table-success">${date}</td>`;
@@ -68,6 +68,7 @@ async function main(){
 
     let calendarData = await fetch("http://localhost:8080/calendar").then((result)=>{ return result.json() });
     let successfulDays = await fetch("http://localhost:8080/successfulDays").then((result)=>{ return result.json() });
+    if (successfulDays == null){ successfulDays = [] }
     createCalanderSkeleton(MONTHS);
 
     let previousMonth = 0;
@@ -108,6 +109,7 @@ async function main(){
 
     submitButton.addEventListener('click', ()=>{
         let data = submitButton.value;
+        console.log(data)
         submitButton.disabled = true;
         fetch('http://localhost:8080/successfulDays',{
                                                     method: "POST",
